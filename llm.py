@@ -1,7 +1,6 @@
 from openai import OpenAI
 import openai
 import os
-
 import time
 from apirequest import get_product_ecoscore
 
@@ -16,7 +15,7 @@ class GPTModel:
         if score not in ['a', 'b', 'c', 'd', 'e']:
             return f"Could not find score for {item}"
         if score == 'a' or score == 'b':
-            message = f"""This is a great choice! {item} has a sustainability score of {score}."""
+            message = f"""This is a great choice! {item} has a sustainability score of {score.upper()}."""
         else:
             message = f"""
 Your item {item} has a poor sustainability score of {score}. 
@@ -33,62 +32,27 @@ A grocery story shopper is buying an unsustainable item, {item}. Suggest more su
         else:
             try:
                 self.loading = True
-                start = time.time()
                 res = self.gpt.chat.completions.create(
                     model='llama3.1-8b',
                     messages=self.messages
                 )
-                #print(res)
                 response = res.choices[0].message.content
-                
-                end = time.time()
-                #print("time:", end-start)
-                self.last_runtime = end-start
                 print(f"[generate_llm_response]: response: {response}")
-                self.add_message_history(prompt, response, model)
             except Exception as e:
                 self.loading = False
                 response = f"An error occurred: {str(e)}"
                 print(f"[generate_llm_response]: Error: {response}")
-
-        try:
-            self.loading = True
-            start = time.time()
-
-            res = self.gpt.chat.completions.create(
-                model=model,  
-                messages=self.messages
-            )
-
-            response = res.choices[0].message.content
-
-            end = time.time()
-            self.last_runtime = end - start
-
-            print(f"[generate_llm_response]: Response: {response}")
-            self.add_message_history(prompt, response)
-
-        except Exception as e:
-            response = f"Error: {str(e)}"
-            print(f"[generate_llm_response]: {response}")
-        finally:
-            self.loading = False
+            finally:
+                self.loading = False
 
         return response
 
-    def add_message_history(self, prompt, response):
-        self.messages.append({"role": "assistant", "content": response})
 
 if __name__ == "__main__":
-    model = GPTModel(dims=100)  
+    model = GPTModel()  
     
     barcode = "3017620422003"  
     product_name, ecoscore = get_product_ecoscore(barcode)
     
     eco_message = model.generate_output(product_name, ecoscore)
     print(eco_message)
-    if ecoscore in ['C', 'D', 'E']:
-        print("here")
-        user_prompt = f"What are more sustainable alternatives to {product_name}?"
-        ai_response = model.generate_llm_response(user_prompt)
-        print(ai_response)
