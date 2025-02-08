@@ -66,12 +66,13 @@ class GPTModel:
 if __name__ == "__main__":
     model = GPTModel(dims=100)  
     
-    barcode = "3017620422003"  # Example barcode (Nutella)
+    barcode = "3017620422003"  
     product_name, ecoscore = get_product_ecoscore(barcode)
     
     eco_message = model.generate_output(product_name, ecoscore)
     print(eco_message)
-    
-    user_prompt = f"What are more sustainable alternatives to {product_name}?"
-    ai_response = model.generate_llm_response(user_prompt)
-    print(ai_response)
+    if ecoscore in ['C', 'D', 'E']:
+        print("here")
+        user_prompt = f"What are more sustainable alternatives to {product_name}?"
+        ai_response = model.generate_llm_response(user_prompt)
+        print(ai_response)
