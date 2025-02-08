@@ -45,6 +45,7 @@ class Camera:
         GPIO.cleanup()
         print("GPIO cleaned up.")
 
+    
 # Run the program
 if __name__ == "__main__":
     camera = Camera(button_pin=17)  # Change the GPIO pin if needed
