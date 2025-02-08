@@ -24,8 +24,7 @@ class Camera:
 
     def capture_photo(self, channel):
         """Capture a photo and save it with a timestamp."""
-        timestamp = time.strftime("%Y%m%d-%H%M%S")
-        filename = f"{self.save_path}photo_{timestamp}.jpg"
+        filename = f"photo.jpg"
         self.picam2.capture_file(filename)
         print(f"Photo saved: {filename}")
 
