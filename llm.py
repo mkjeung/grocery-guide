@@ -4,7 +4,7 @@ import time
 
 class GPTModel:
     def __init__(self, dims) -> None:
-        self.gpt = OpenAI(api_key="a")
+        #self.gpt = OpenAI()
         self.prompts = Prompts()
         self.dims = dims
         self.loading = False
