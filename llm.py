@@ -1,5 +1,9 @@
 from openai import OpenAI
+import openai
+import os
+
 import time
+from apirequest import get_product_ecoscore
 
 class GPTModel:
     def __init__(self) -> None:
@@ -47,13 +51,44 @@ A grocery story shopper is buying an unsustainable item, {item}. Suggest more su
                 response = f"An error occurred: {str(e)}"
                 print(f"[generate_llm_response]: Error: {response}")
 
-            finally:
-                self.loading = False
-            return response
-    
-    def add_message_history(self, prompt, response, model):
+        try:
+            self.loading = True
+            start = time.time()
+
+            res = self.gpt.chat.completions.create(
+                model=model,  
+                messages=self.messages
+            )
+
+            response = res.choices[0].message.content
+
+            end = time.time()
+            self.last_runtime = end - start
+
+            print(f"[generate_llm_response]: Response: {response}")
+            self.add_message_history(prompt, response)
+
+        except Exception as e:
+            response = f"Error: {str(e)}"
+            print(f"[generate_llm_response]: {response}")
+        finally:
+            self.loading = False
+
+        return response
+
+    def add_message_history(self, prompt, response):
         self.messages.append({"role": "assistant", "content": response})
 
 if __name__ == "__main__":
-    model = GPTModel()
-    model.generate_llm_response("what do you think of lebron")    
+    model = GPTModel(dims=100)  
+    
+    barcode = "3017620422003"  
+    product_name, ecoscore = get_product_ecoscore(barcode)
+    
+    eco_message = model.generate_output(product_name, ecoscore)
+    print(eco_message)
+    if ecoscore in ['C', 'D', 'E']:
+        print("here")
+        user_prompt = f"What are more sustainable alternatives to {product_name}?"
+        ai_response = model.generate_llm_response(user_prompt)
+        print(ai_response)
