@@ -3,7 +3,7 @@ from picamera2 import Picamera2
 import time
 
 class Camera:
-    def __init__(self, button_pin=17, save_path="/home/pi/Pictures/"):
+    def __init__(self, button_pin=17, save_path=""):
         """Initialize the button and camera module."""
         self.button_pin = button_pin
         self.save_path = save_path
@@ -31,12 +31,14 @@ class Camera:
 
     def run(self):
         """Keep the script running and handle cleanup on exit."""
-        try:
-            while True:
-                time.sleep(0.1)  # Keep the script running
-        except KeyboardInterrupt:
-            print("\nExiting...")
-            self.cleanup()
+        # try:
+        #     while True:
+        #         time.sleep(0.1)  # Keep the script running
+        # except KeyboardInterrupt:
+        #     print("\nExiting...")
+        #     self.cleanup()
+        self.capture_photo()
+        self.cleanup()
 
     def cleanup(self):
         """Cleanup GPIO settings on exit."""
