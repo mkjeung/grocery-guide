@@ -43,6 +43,7 @@ class Camera:
         self.capture_photo()
         barcode = BarcodeReader("photo.jpg")
         if not barcode or barcode == "":
+            text_to_speech("Please try again, scan a valid barcode")
             self.cleanup()
 
         product_name, ecoscore = get_product_ecoscore(barcode)
