@@ -10,7 +10,7 @@ import os
 class Camera:
     def __init__(self, save_path=""):
         """Initialize the button and camera module."""
-        self.button_pin = 11
+        self.button_pin = 12
         self.save_path = save_path
         self.green_pin = 3
         self.yellow_pin = 5
@@ -32,7 +32,7 @@ class Camera:
         self.picam2.start()
 
         # Set up event detection
-        GPIO.add_event_detect(self.button_pin, GPIO.RISING, callback=self.handle_button, bouncetime=300)
+        #GPIO.setup(self.button_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)  # Enable internal pull-up
 
         print(f"ButtonCamera initialized. Waiting for button press... (GPIO {self.button_pin})")
 
@@ -46,6 +46,7 @@ class Camera:
         text_to_speech(string)
 
     def handle_button(self):
+        print("Button pressed!")
         self.capture_photo()
         barcode = BarcodeReader("photo.jpg")
         if not barcode or barcode == "":
@@ -81,10 +82,12 @@ class Camera:
 
     def test_lights(self):
         for i in range(3):
+            print("A")
             GPIO.output(self.green_pin, GPIO.HIGH)
             GPIO.output(self.yellow_pin, GPIO.HIGH)
             GPIO.output(self.red_pin, GPIO.HIGH)
             time.sleep(1)
+            print("B")
             GPIO.output(self.green_pin, GPIO.LOW)
             GPIO.output(self.yellow_pin, GPIO.LOW)
             GPIO.output(self.red_pin, GPIO.LOW)
@@ -92,18 +95,21 @@ class Camera:
 
     def run(self):
         """Keep the script running and handle cleanup on exit."""
-        # try:
-        #     while True:
-        #         time.sleep(0.1)  # Keep the script running
-        # except KeyboardInterrupt:
-        #     print("\nExiting...")
-        #     self.cleanup()
+        try:
+            while True:
+                if GPIO.input(self.button_pin) == GPIO.LOW:
+                    self.handle_button()
+                time.sleep(0.1)
+        except KeyboardInterrupt:
+            print("\nExiting...")
+            self.cleanup()
         #self.test_lights()
+        self.cleanup()
 
 
     def cleanup(self):
         """Cleanup GPIO settings on exit."""
-        os.remove("photo.jpg")
+       # os.remove("photo.jpg")
         GPIO.cleanup()
         print("GPIO cleaned up.")
 
