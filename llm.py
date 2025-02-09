@@ -3,6 +3,7 @@ import openai
 import os
 import time
 from apirequest import get_product_ecoscore
+from tts import text_to_speech
 
 class GPTModel:
     def __init__(self) -> None:
@@ -55,4 +56,4 @@ if __name__ == "__main__":
     product_name, ecoscore = get_product_ecoscore(barcode)
     
     eco_message = model.generate_output(product_name, ecoscore)
-    print(eco_message)
+    text_to_speech(eco_message)
