@@ -44,5 +44,5 @@ def BarcodeReader(image):
 
 if __name__ == "__main__": 
 # Take the image from user 
-    image = "./nutella2.png"  # Relative path
+    image = "./IMG_3293 (1).jpeg"  # Relative path
     print(BarcodeReader(image) )
