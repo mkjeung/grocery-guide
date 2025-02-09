@@ -2,28 +2,40 @@ from openai import OpenAI
 import openai
 import os
 import time
-from apirequest import get_product_ecoscore
-from tts import text_to_speech
+
+
+def txt_reading():
+    items_dict = {}
+    with open("data.txt", "r") as file:
+        for line in file:
+            item, score = line.strip().split(",")
+            items_dict[item] = int(score)
+
+    return items_dict
 
 class GPTModel:
     def __init__(self) -> None:
         self.gpt = OpenAI(api_key='LA-3f0a8c11e9454fe5828778015edc487d7a77ef71f1d844808c92a6f91363cc54', base_url = "https://api.llama-api.com")
         self.loading = False
         self.messages = []
+    
 
-    def generate_output(self, item, score):
+    def summary(self, items_dict):
         score = score.lower()
-        if score not in ['a', 'b', 'c', 'd', 'e']:
-            return f"Could not find score for {item}"
-        if score == 'a' or score == 'b':
-            message = f"""This is a great choice! {item} has a sustainability score of {score.upper()}."""
+        if not len(items_dict):
+            return "There are no items to be analyzed."
         else:
             message = f"""
-Your item {item} has a poor sustainability score of {score}. 
+You have shopped for {", ".join(items_dict.keys())} \n Here is the overall sustainability review for these items. 
 """
             prompt = f"""
-A grocery store shopper is buying an unsustainable item, {item}. Suggest more sustainable alternatives. Respond in one polite sentence listing alternatives. Do not go beyond one sentence.
+A grocery shopper is buying a variety of items: {", ".join(items_dict.keys())}. Those items had the following \
+sustainability scores: {", ".join(items_dict.values())}. Given this information, please give a polite summary of the \
+grocery trip, and some tips for how the shopper might be able to be more sustainable on the next trip.\
+ Do not go beyond one about 4 sentences.
 """
+            with open("data.txt", "r+") as file:
+                file.truncate(0)
             return message + self.generate_llm_response(prompt)
 
     def generate_llm_response(self, prompt: str) -> str:
@@ -50,10 +62,7 @@ A grocery store shopper is buying an unsustainable item, {item}. Suggest more su
 
 
 if __name__ == "__main__":
-    model = GPTModel()  
-    
-    barcode = "3017620422003"  
-    product_name, ecoscore = get_product_ecoscore(barcode)
-    
-    eco_message = model.generate_output(product_name, ecoscore)
-    text_to_speech(eco_message)
+    model = GPTModel() 
+    items_dicts = txt_reading()
+    analytics_message = model.summary(items_dicts)
+    print(analytics_message)
