@@ -1,4 +1,5 @@
 from openai import OpenAI
+import threading
 import openai
 import os
 import time
@@ -7,7 +8,7 @@ from tts import text_to_speech
 
 class GPTModel:
     def __init__(self) -> None:
-        self.gpt = OpenAI(api_key='LA-3f0a8c11e9454fe5828778015edc487d7a77ef71f1d844808c92a6f91363cc54', base_url = "https://api.llama-api.com")
+        self.gpt = OpenAI(api_key='', base_url = "https://api.llama-api.com")
         self.loading = False
         self.messages = []
 
@@ -28,10 +29,16 @@ A grocery store shopper is buying an unsustainable item, {item}. Suggest more su
 
     def generate_llm_response(self, prompt: str) -> str:
         self.messages.append({'role': 'user', 'content': prompt})
+        
         if self.loading:
-            response = "A prompt is already being processed."
-        else:
+            return "A prompt is already being processed."
+        
+        response = "The response is taking too long. Please try again later."
+        
+        def llm_call():
+            nonlocal response
             try:
+                print("Loading LLM!")
                 self.loading = True
                 res = self.gpt.chat.completions.create(
                     model='llama3.1-8b',
@@ -40,11 +47,19 @@ A grocery store shopper is buying an unsustainable item, {item}. Suggest more su
                 response = res.choices[0].message.content
                 print(f"[generate_llm_response]: response: {response}")
             except Exception as e:
-                self.loading = False
                 response = f"An error occurred: {str(e)}"
                 print(f"[generate_llm_response]: Error: {response}")
             finally:
                 self.loading = False
+
+        # Start the LLM call in a separate thread
+        thread = threading.Thread(target=llm_call)
+        thread.start()
+        thread.join(timeout=5)  # Wait up to 3 seconds
+        
+        if thread.is_alive():
+            self.loading = False  # Ensure loading flag is reset
+            print("[generate_llm_response]: Timed out.")
 
         return response
 
@@ -54,6 +69,6 @@ if __name__ == "__main__":
     
     barcode = "3017620422003"  
     product_name, ecoscore = get_product_ecoscore(barcode)
-    
+    print(product_name)
     eco_message = model.generate_output(product_name, ecoscore)
     text_to_speech(eco_message)
