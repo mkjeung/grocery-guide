@@ -47,9 +47,12 @@ class Camera:
             self.cleanup()
 
         product_name, ecoscore = get_product_ecoscore(barcode)
-        model = GPTModel()
-        eco_message = model.generate_output(product_name, ecoscore)
-        text_to_speech(eco_message)
+        if ecoscore not in ['a', 'b', 'c', 'd', 'e']:
+            print("We do not have environmental data on this product")
+        else:
+            model = GPTModel()
+            eco_message = model.generate_output(product_name, ecoscore)
+            text_to_speech(eco_message)
         self.cleanup()
 
     def cleanup(self):
