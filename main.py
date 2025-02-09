@@ -5,6 +5,7 @@ from barcodescanner import BarcodeReader
 from apirequest import get_product_ecoscore
 from tts import text_to_speech
 from llm import GPTModel
+import os
 
 class Camera:
     def __init__(self, button_pin=17, save_path=""):
@@ -44,6 +45,7 @@ class Camera:
         barcode = BarcodeReader("photo.jpg")
         if not barcode or barcode == "":
             text_to_speech("Please try again, scan a valid barcode")
+            os.remove("photo.jpg")
             self.cleanup()
 
         product_name, ecoscore = get_product_ecoscore(barcode)
@@ -53,10 +55,12 @@ class Camera:
             model = GPTModel()
             eco_message = model.generate_output(product_name, ecoscore)
             text_to_speech(eco_message)
+        os.remove("photo.jpg")
         self.cleanup()
 
     def cleanup(self):
         """Cleanup GPIO settings on exit."""
+        os.remove("photo.jpg")
         GPIO.cleanup()
         print("GPIO cleaned up.")
 

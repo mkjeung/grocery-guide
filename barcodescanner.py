@@ -29,7 +29,7 @@ def BarcodeReader(image_path):
     #detected_barcodes = decode(enhanced_img)
 
     #if not detected_barcodes:
-        print("❌ Barcode Not Detected!")
+        print("Barcode Not Detected!")
         return
 
     # Process and return barcode data
@@ -38,7 +38,7 @@ def BarcodeReader(image_path):
         #cv2.rectangle(img, (x-10, y-10), (x + w+10, y + h+10), (255, 0, 0), 2)
         #if barcode.data:
             #print(f"📦 Detected Barcode: {barcode.data.decode('utf-8')}")
-            #return barcode.data.decode("utf-8")
+                    #return barcode.data.decode("utf-8")
         return decoded_info
 
     # Display the processed image
