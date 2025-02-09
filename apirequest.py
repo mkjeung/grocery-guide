@@ -13,7 +13,7 @@ def get_product_ecoscore(barcode):
     else:
         return "API request failed", "N/A"
 def main():
-    example_barcode = " "  
+    example_barcode = "3017620422003"  
     product_name, ecoscore = get_product_ecoscore(example_barcode)
     print(f"Product: {product_name}")
     print(f"Eco-Score: {ecoscore}")
