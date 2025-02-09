@@ -42,6 +42,9 @@ class Camera:
         #     self.cleanup()
         self.capture_photo()
         barcode = BarcodeReader("photo.jpg")
+        if not barcode or barcode == "":
+            self.cleanup()
+
         product_name, ecoscore = get_product_ecoscore(barcode)
         model = GPTModel()
         eco_message = model.generate_output(product_name, ecoscore)
