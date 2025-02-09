@@ -1,5 +1,6 @@
 # Importing library 
 import cv2 
+import os
 from pyzbar.pyzbar import decode 
 
 # Make one method to decode the barcode 
@@ -14,6 +15,7 @@ def BarcodeReader(image):
 	# If not detected then print the message 
 	if not detectedBarcodes: 
 		print("Barcode Not Detected or your barcode is blank/corrupted!") 
+		return
 	else: 
 		
 		# Traverse through all the detected barcodes in image 
@@ -31,8 +33,9 @@ def BarcodeReader(image):
 			if barcode.data!="": 
 				
 			# Print the barcode data 
-				print(barcode.data) 
-				print(barcode.type) 
+				return str(int(barcode.data))
+	
+				
 				
 	#Display the image 
 	cv2.imshow("Image", img) 
@@ -41,5 +44,5 @@ def BarcodeReader(image):
 
 if __name__ == "__main__": 
 # Take the image from user 
-	image="Img.jpg"
-	BarcodeReader(image) 
+    image = "./nutella2.png"  # Relative path
+    print(BarcodeReader(image) )
