@@ -1,6 +1,10 @@
 import RPi.GPIO as GPIO
 from picamera2 import Picamera2
 import time
+from barcodescanner import BarcodeReader
+from apirequest import get_product_ecoscore
+from tts import text_to_speech
+from llm import GPTModel
 
 class Camera:
     def __init__(self, button_pin=17, save_path=""):
@@ -22,7 +26,7 @@ class Camera:
 
         print(f"ButtonCamera initialized. Waiting for button press... (GPIO {self.button_pin})")
 
-    def capture_photo(self, channel):
+    def capture_photo(self):
         """Capture a photo and save it with a timestamp."""
         filename = f"photo.jpg"
         self.picam2.capture_file(filename)
@@ -37,6 +41,11 @@ class Camera:
         #     print("\nExiting...")
         #     self.cleanup()
         self.capture_photo()
+        barcode = BarcodeReader("photo.jpg")
+        product_name, ecoscore = get_product_ecoscore(barcode)
+        model = GPTModel()
+        eco_message = model.generate_output(product_name, ecoscore)
+        text_to_speech(eco_message)
         self.cleanup()
 
     def cleanup(self):
